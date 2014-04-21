@@ -51,6 +51,11 @@ helloblock.faucet.withdraw(testnetAddress, 10000, function(err) {
         2. Script pubkey (how do you generate a script pubkey)
     */
 
+    /*
+      Complex version:
+        1. show byte table (this is what we are up to) - bytes of an unsigned raw tx
+    */
+
     // Once the transaction has been constructued fully, Let's now sign it
     // Step 3d: sign - input 0
     tx.sign(0, key)
