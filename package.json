@@ -1,0 +1,12 @@
+{
+	"name": "tutorials",
+	"version": "0.0.0",
+	"description": "",
+	"main": "simple.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"simple": "browserify simple.js -o simple.min.js && open simple.html"
+	},
+	"author": "",
+	"license": "ISC"
+}
