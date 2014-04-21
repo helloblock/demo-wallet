@@ -1,12 +1,16 @@
 {
-	"name": "tutorials",
-	"version": "0.0.0",
-	"description": "",
-	"main": "simple.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"simple": "browserify simple.js -o simple.min.js && open simple.html"
-	},
-	"author": "",
-	"license": "ISC"
+  "name": "tutorials",
+  "version": "0.0.0",
+  "description": "",
+  "main": "simple.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "simple": "browserify simple.js -o simple.min.js && open simple.html"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "helloblock-js": "^0.2.0",
+    "bitcoinjs-lib": "^0.2.0"
+  }
 }
