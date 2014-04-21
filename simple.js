@@ -1,10 +1,3 @@
-console.log('test')
-var helloblock = require('helloblock-js')({
-  network: 'testnet',
-  debug: true
-});
-var bitcoin = require('bitcoinjs-lib');
-
 // Step 1: Generate addresses
 // See this article for how to generate addresses. The difference between mainnet address and testnet address is the version bytes.
 // So let's supply it with testnet version bytes
