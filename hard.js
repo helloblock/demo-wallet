@@ -1,16 +1,25 @@
 var bitcoin = require("bitcoinjs-lib")
+var Script = bitcoin.Script
+var Transaction = bitcoin.Transaction
+var TransactionIn = bitcoin.TransactionIn
+var TransactionOut = bitcoin.TransactionOut
+var Opcode = bitcoin.Opcode
+var Address = bitcoin.Address
+var ECKey = bitcoin.ECKey
+var network = bitcoin.network
+
 var helloblock = require('helloblock-js')({
     network: 'testnet'
 });
 
-var privateKey = "cMiDoTUNgW3KBzW5pbP9TPe1ULxBai46kU8P9ZTpYbMMqg4Zh2Ww"
-var key = new bitcoin.ECKey(privateKey);
-var addressVersion = bitcoin.network.testnet.addressVersion
+var privateKey = "cND8kTK2zSJf1bTqaz5nZ2Pdqtv43kQNcwJ1Dp5XWtbRokJNS97N"
+var key = new ECKey(privateKey);
+var addressVersion = network.testnet.addressVersion
 var fromAddress = key.getAddress(addressVersion).toString();
 var toAddress = 'mzPkw5EdvHCntC2hrhRXSqwHLHpLWzSZiL'
 
-var targetValue = 200000
 var fee = 10000
+var targetValue = 200000
 
 helloblock.addresses.getUnspents(fromAddress, {
     value: targetValue + fee
@@ -18,12 +27,14 @@ helloblock.addresses.getUnspents(fromAddress, {
     if (err) throw new Error(err);
 
     var unspents = resource;
-    var tx = new bitcoin.Transaction()
+    var totalUnspentsValue = 0;
+
+    var tx = new Transaction()
 
     // INPUTS
     unspents.forEach(function(unspent) {
-        var input = new bitcoin.TransactionIn({
-            sequence: 0xffffffff,
+        var input = new TransactionIn({
+            sequence: [255, 255, 255, 255],
             outpoint: {
                 hash: unspent.txHash,
                 index: unspent.index
@@ -33,6 +44,7 @@ helloblock.addresses.getUnspents(fromAddress, {
 
         tx.ins.push(input)
 
+        totalUnspentsValue += unspent.value
     })
 
     // OUTPUTS
@@ -44,12 +56,14 @@ helloblock.addresses.getUnspents(fromAddress, {
     scriptRecipient.writeOp(Opcode.map.OP_EQUALVERIFY)
     scriptRecipient.writeOp(Opcode.map.OP_CHECKSIG)
 
-    var outputRecipient = new bitcoin.TransactionOut({
+    var outputRecipient = new TransactionOut({
         value: targetValue,
         script: scriptRecipient
     })
 
-    var changeValue = unspent.value - targetValue - fee
+    tx.outs.push(outputRecipient)
+
+    var changeValue = totalUnspentsValue - targetValue - fee
 
     var scriptChange = new Script()
     scriptChange.writeOp(Opcode.map.OP_DUP)
@@ -58,25 +72,21 @@ helloblock.addresses.getUnspents(fromAddress, {
     scriptChange.writeOp(Opcode.map.OP_EQUALVERIFY)
     scriptChange.writeOp(Opcode.map.OP_CHECKSIG)
 
-    var outputRecipient = new bitcoin.TransactionOut({
+    var outputChange = new TransactionOut({
         value: changeValue,
         script: scriptChange
     })
 
+    tx.outs.push(outputChange)
+
     // SIGNING
     var SIGHASH_ALL = 1
     var pubkey = key.getPub().toBytes()
-    var keyHash160 = util.sha256ripe160(pubkey)
-    txs.ins.forEach(function(input, index) {
-        var previousScript = new Script()
-        previousScript.writeOp(Opcode.map.OP_DUP)
-        previousScript.writeOp(Opcode.map.OP_HASH160)
-        previousScript.writeBytes(keyHash160)
-        previousScript.writeOp(Opcode.map.OP_EQUALVERIFY)
-        previousScript.writeOp(Opcode.map.OP_CHECKSIG)
+    tx.ins.forEach(function(input, index) {
+        var previousScript = Script.fromHex(unspents[index].scriptPubKey)
 
         var hash = tx.hashTransactionForSignature(previousScript, index, SIGHASH_ALL)
-        var signature = key.sign(hash).concat([type])
+        var signature = key.sign(hash).concat([SIGHASH_ALL])
 
         var inputScript = new Script()
         inputScript.writeBytes(signature)
@@ -86,6 +96,8 @@ helloblock.addresses.getUnspents(fromAddress, {
     })
 
     var rawTxHex = tx.serializeHex();
+
+    console.log(rawTxHex)
 
     helloblock.transactions.propagate(rawTxHex, function(err, response, resource) {
         if (err) throw new Error(err);
