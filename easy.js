@@ -1,46 +1,43 @@
 var bitcoin = require("bitcoinjs-lib")
 var helloblock = require('helloblock-js')({
     network: 'testnet'
-});
+})
+
+var addressVersion = bitcoin.network.testnet.addressVersion
 
 var privateKey = "cND8kTK2zSJf1bTqaz5nZ2Pdqtv43kQNcwJ1Dp5XWtbRokJNS97N"
-var key = new bitcoin.ECKey(privateKey);
-var addressVersion = bitcoin.network.testnet.addressVersion
-var fromAddress = key.getAddress(addressVersion).toString();
+var ecKey = new bitcoin.ECKey(privateKey)
+var ecKeyAddress = ecKey.getAddress(addressVersion).toString()
 var toAddress = 'mzPkw5EdvHCntC2hrhRXSqwHLHpLWzSZiL'
 
-var fee = 10000
-var targetValue = 200000
+var txFee = 10000
+var txTargetValue = 200000
 
-helloblock.addresses.getUnspents(fromAddress, {
-    value: targetValue + fee
-}, function(err, response, resource) {
-    if (err) throw new Error(err);
-
-    var unspents = resource;
-    var totalUnspentsValue = 0;
+helloblock.addresses.getUnspents(ecKeyAddress, {
+    value: txTargetValue + txFee
+}, function(err, res, unspents) {
+    if (err) throw new Error(err)
 
     var tx = new bitcoin.Transaction()
 
+    var totalUnspentsValue = 0
     unspents.forEach(function(unspent) {
         tx.addInput(unspent.txHash, unspent.index)
         totalUnspentsValue += unspent.value
     })
 
-    tx.addOutput(toAddress, targetValue)
+    tx.addOutput(toAddress, txTargetValue)
 
-    var changeValue = totalUnspentsValue - targetValue - fee
-    tx.addOutput(fromAddress, changeValue)
+    var txChangeValue = totalUnspentsValue - txTargetValue - txFee
+    tx.addOutput(ecKeyAddress, txChangeValue)
 
-    tx.sign(0, key)
+    tx.sign(0, ecKey)
 
-    var rawTxHex = tx.serializeHex();
+    var rawTxHex = tx.serializeHex()
 
-    console.log(rawTxHex)
+    helloblock.transactions.propagate(rawTxHex, function(err, res, tx) {
+        if (err) throw new Error(err)
 
-    // helloblock.transactions.propagate(rawTxHex, function(err, response, resource) {
-    //     if (err) throw new Error(err);
-
-    //     console.log('https://test.helloblock.io/transactions/' + resource.txHash)
-    // })
+        console.log('https://test.helloblock.io/transactions/' + tx.txHash)
+    })
 })
