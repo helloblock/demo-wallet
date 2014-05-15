@@ -1,16 +1,13 @@
 {
-  "name": "tutorials",
-  "version": "0.0.0",
-  "description": "",
-  "main": "simple.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "simple": "browserify dependency.js -o dependency.min.js && browserify simple.js -o simple.min.js && open simple.html"
-  },
-  "author": "",
+  "name": "Wallet",
+  "version": "0.0.1",
+  "description": "HelloBlock Tutorial",
+  "author": "Scott Li, Sidney Zhang",
   "license": "ISC",
   "dependencies": {
     "helloblock-js": "^0.2.0",
-    "bitcoinjs-lib": "^0.2.0"
+    "bitcoinjs-lib": "^0.2.0",
+    "uglify-js": "~2.4.13",
+    "browserify": "~4.1.3"
   }
 }

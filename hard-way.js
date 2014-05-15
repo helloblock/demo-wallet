@@ -1,7 +1,7 @@
-var bitcoin = require("bitcoinjs-lib")
-var helloblock = require('helloblock-js')({
-  network: 'testnet'
-})
+// var bitcoin = require("bitcoinjs-lib")
+// var helloblock = require('helloblock-js')({
+//   network: 'testnet'
+// })
 var addressVersion = bitcoin.network.testnet.addressVersion
 
 var privateKey = "cND8kTK2zSJf1bTqaz5nZ2Pdqtv43kQNcwJ1Dp5XWtbRokJNS97N"
@@ -28,8 +28,7 @@ helloblock.addresses.getUnspents(ecKeyAddress, {
       outpoint: {
         hash: unspent.txHash,
         index: unspent.index
-      },
-      script: undefined
+      }
     })
 
     tx.ins.push(input)
