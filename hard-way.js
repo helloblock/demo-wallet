@@ -27,6 +27,8 @@ helloblock.addresses.getUnspents(ecKeyAddress, {
   var totalUnspentsValue = 0
 
   // INPUTS
+  // HelloBlock selects the optimal unspent outputs above using 'value'
+  // Now, we add all unspent outputs as an input in this transaction
   unspents.forEach(function(unspent) {
     var input = new bitcoin.TransactionIn({
       sequence: [255, 255, 255, 255],
