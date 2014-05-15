@@ -2,6 +2,11 @@
 // var helloblock = require('helloblock-js')({
 //   network: 'testnet'
 // })
+
+var helloblock = new HelloBlock({
+  network: 'testnet'
+})
+
 var addressVersion = bitcoin.network.testnet.addressVersion
 
 var privateKey = "cND8kTK2zSJf1bTqaz5nZ2Pdqtv43kQNcwJ1Dp5XWtbRokJNS97N"
