@@ -35,7 +35,9 @@ helloblock.addresses.getUnspents(ecKeyAddress, {
   var txChangeValue = totalUnspentsValue - txTargetValue - txFee
   tx.addOutput(ecKeyAddress, txChangeValue)
 
-  tx.sign(0, ecKey)
+  tx.ins.forEach(function(input, index) {
+    tx.sign(index, ecKey)
+  })
 
   var rawTxHex = tx.serializeHex()
 
